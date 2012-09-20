@@ -145,6 +145,27 @@ func (m Max) DefaultMessage() string {
 	return fmt.Sprintln("Maximum is", m.Max)
 }
 
+// Requires an int to be in an inclusive range.
+type Range struct {
+	Min int
+	Max int
+}
+
+func (r Range) IsSatisfied(obj interface{}) bool {
+	num, ok := obj.(int)
+	if ok {
+		return r.Min <= num && num <= r.Max
+	}
+}
+
+func (r Range) DefaultMessage() string {
+	return fmt.Sprintf("Valid range is %d to %d, inclusive.", r.Min, r.Max)
+}
+
+func (v *Validation) Range(n int, min, max int) *ValidationResult {
+	return v.check(Range{min, max}, n)
+}
+
 func (v *Validation) Max(n int, max int) *ValidationResult {
 	return v.check(Max{max}, n)
 }
