@@ -83,7 +83,14 @@ func handleInternal(w http.ResponseWriter, r *http.Request, ws *websocket.Conn) 
 	}
 
 	// Collect the values for the method's arguments.
-	var actualArgs []reflect.Value
+	actualArgs := BindParameters(controller)
+
+	// Invoke the method.
+	// (Note that the method Value is already bound to the appController receiver.)
+	controller.Invoke(appControllerPtr, method, actualArgs)
+}
+
+func BindParameters(controller *Controller) (actualArgs []reflect.Value) {
 	for _, arg := range controller.MethodType.Args {
 		// If they accept a websocket connection, treat that arg specially.
 		var boundArg reflect.Value
@@ -94,10 +101,6 @@ func handleInternal(w http.ResponseWriter, r *http.Request, ws *websocket.Conn) 
 		}
 		actualArgs = append(actualArgs, boundArg)
 	}
-
-	// Invoke the method.
-	// (Note that the method Value is already bound to the appController receiver.)
-	controller.Invoke(appControllerPtr, method, actualArgs)
 }
 
 // Run the server.
