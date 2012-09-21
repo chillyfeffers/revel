@@ -8,6 +8,7 @@ import (
 	"testing"
 )
 
+// Need to test dates.
 const (
 	FORM_DATA = `name=Johnny+Test&age=12&money=0&negative=-50&blank_str=&boolean=true&blank_int=&dead=false&blank_bool=`
 )

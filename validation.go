@@ -75,6 +75,10 @@ type Check interface {
 	DefaultMessage() string
 }
 
+/*
+	Required validator. Use to ensure that a parameter is present in the request parameters and
+	is not empty. Empty strings, slices, and zero dates are considered empty.
+*/
 type Required struct{}
 
 func (r Required) IsSatisfied(obj interface{}) bool {
@@ -88,12 +92,6 @@ func (r Required) IsSatisfied(obj interface{}) bool {
 	if list, ok := obj.([]interface{}); ok {
 		return len(list) > 0
 	}
-	if b, ok := obj.(bool); ok {
-		return b
-	}
-	if i, ok := obj.(int); ok {
-		return i != 0
-	}
 	if t, ok := obj.(time.Time); ok {
 		return !t.IsZero()
 	}
@@ -104,11 +102,13 @@ func (r Required) DefaultMessage() string {
 	return "Required"
 }
 
-// Test that the argument is non-nil and non-empty (if string or list)
 func (v *Validation) Required(obj interface{}) *ValidationResult {
 	return v.check(Required{}, obj)
 }
 
+/*
+	Min validator. Use to ensure that a parameter is an integer not less than a certain number.
+*/
 type Min struct {
 	Min int
 }
@@ -129,6 +129,9 @@ func (v *Validation) Min(n int, min int) *ValidationResult {
 	return v.check(Min{min}, n)
 }
 
+/*
+	Max validator. Use to ensure that a parameter is an integer not greater than a certain number.
+*/
 type Max struct {
 	Max int
 }
@@ -145,7 +148,13 @@ func (m Max) DefaultMessage() string {
 	return fmt.Sprintln("Maximum is", m.Max)
 }
 
-// Requires an int to be in an inclusive range.
+func (v *Validation) Max(n int, max int) *ValidationResult {
+	return v.check(Max{max}, n)
+}
+
+/*
+	Range validator. Use to ensure that a parameter is an int within an inclusive integer interval.
+*/
 type Range struct {
 	Min int
 	Max int
@@ -164,10 +173,6 @@ func (r Range) DefaultMessage() string {
 
 func (v *Validation) Range(n int, min, max int) *ValidationResult {
 	return v.check(Range{min, max}, n)
-}
-
-func (v *Validation) Max(n int, max int) *ValidationResult {
-	return v.check(Max{max}, n)
 }
 
 // Requires an array or string to be at least a given length.
