@@ -165,6 +165,7 @@ func (r Range) IsSatisfied(obj interface{}) bool {
 	if ok {
 		return r.Min <= num && num <= r.Max
 	}
+	return false
 }
 
 func (r Range) DefaultMessage() string {
@@ -173,6 +174,69 @@ func (r Range) DefaultMessage() string {
 
 func (v *Validation) Range(n int, min, max int) *ValidationResult {
 	return v.check(Range{min, max}, n)
+}
+
+/*
+	Positive validator. Use to ensure that a parameter is a positive integer.
+*/
+type Positive struct{}
+
+func (p Positive) IsSatisfied(obj interface{}) bool {
+	num, ok := obj.(int)
+	if ok {
+		return num > 0
+	}
+	return false
+}
+
+func (p Positive) DefaultMessage() string {
+	return fmt.Sprintln("Number must be positive.")
+}
+
+func (v *Validation) Positive(n int) *ValidationResult {
+	return v.check(Positive{}, n)
+}
+
+/*
+	Negative validator. Use to ensure that a parameter is a Negative integer.
+*/
+type Negative struct{}
+
+func (n Negative) IsSatisfied(obj interface{}) bool {
+	num, ok := obj.(int)
+	if ok {
+		return num < 0
+	}
+	return false
+}
+
+func (n Negative) DefaultMessage() string {
+	return fmt.Sprintln("Number must be Negative.")
+}
+
+func (v *Validation) Negative(n int) *ValidationResult {
+	return v.check(Negative{}, n)
+}
+
+/*
+	NonZero validator. Use to ensure that a parameter is a non-zero integer.
+*/
+type NonZero struct{}
+
+func (p NonZero) IsSatisfied(obj interface{}) bool {
+	num, ok := obj.(int)
+	if ok {
+		return num != 0
+	}
+	return false
+}
+
+func (p NonZero) DefaultMessage() string {
+	return fmt.Sprintln("Number must not be equal to 0.")
+}
+
+func (v *Validation) NonZero(n int) *ValidationResult {
+	return v.check(NonZero{}, n)
 }
 
 // Requires an array or string to be at least a given length.
